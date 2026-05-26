@@ -156,6 +156,18 @@ for a professional feel.
 <br>
 <img width="334" height="588" alt="WhatsApp Image 2026-05-11 at 22 56 37" src="https://github.com/user-attachments/assets/db08b0ed-079e-4d7e-acb0-bc7ad4f1ba8d" />
 <img width="313" height="185" alt="WhatsApp Image 2026-05-11 at 22 56 49" src="https://github.com/user-attachments/assets/b38a1d89-7a54-47ca-8126-bf655f70164b" />
+<br>
+<img width="965" height="616" alt="image" src="https://github.com/user-attachments/assets/945d2c2f-930b-4ad5-89bc-45f508c5704e" />
+<br>
+<img width="683" height="381" alt="image" src="https://github.com/user-attachments/assets/b44a5213-6977-455c-b4c7-73b5524c344c" />
+<br>
+<img width="677" height="354" alt="image" src="https://github.com/user-attachments/assets/3abc944f-7ae8-4b9d-94bc-4f6ae7f42054" />
+<br>
+<img width="890" height="618" alt="image" src="https://github.com/user-attachments/assets/552d0dd8-183d-4d41-a7d5-4f071f9a37db" />
+
+
+
+
 
 
 
