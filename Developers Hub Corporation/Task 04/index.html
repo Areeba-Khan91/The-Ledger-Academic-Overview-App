@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Health Chatbot (Gemini Powered)</title>
+    
+    <!-- --- CSS Styling (For a Clean Chat Interface) --- -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 80vh;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .chat-history {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e9ecef;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background-color: #d1e7dd; /* Light green */
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-message {
+            background-color: #ffffff; /* White/Clean */
+            margin-right: auto;
+            border: 1px solid #dee2e6;
+            border-bottom-left-radius: 2px;
+            white-space: pre-wrap; /* Allows the chatbot response to preserve newlines */
+            text-align: left;
+        }
+        
+        /* Make the disclaimer stand out */
+        .bot-message:first-of-type {
+             font-style: italic;
+             color: #495057;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+
+        .chat-input button {
+            background-color: #28a745; /* Green send button */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        
+        .chat-input button:disabled {
+            background-color: #6c757d; /* Grey when disabled */
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            padding: 10px;
+            font-style: italic;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            ⚕️ General Health Query Chatbot 🏥
+        </div>
+        
+        <div class="chat-history" id="chatHistory">
+            <div class="message bot-message">
+                Hello! I am an AI-powered general health assistant. How can I provide you with general health information today?
+                <br><br>
+                **Remember:** I cannot diagnose or treat any medical condition. Please consult a doctor for personal medical advice.
+            </div>
+            <!-- Chat messages will be dynamically added here -->
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            Chatbot is typing...
+        </div>
+
+        <form class="chat-input" id="chatForm">
+            <input type="text" id="userInput" placeholder="Ask a general health question (e.g., What causes a sore throat?)" required autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <!-- --- JavaScript Logic (Communication and UI Handling) --- -->
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        // Example: "https://a1b2c3d4e5f6.ngrok-free.app"
+        const REMOTE_BACKEND_URL = "https://5d4fde72324f.ngrok-free.app"; 
+        
+
+        // Function to scroll to the bottom of the chat
+        function scrollToBottom() {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Function to display a message
+        function displayMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            
+            // Use innerHTML to allow for bolding/line breaks from the response
+            // The bot message formatting (pre-wrap) handles the line breaks better
+            messageDiv.innerHTML = text; 
+            
+            chatHistory.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Handle the form submission
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            // 1. Display user message
+            displayMessage(query, 'user');
+            userInput.value = ''; // Clear input
+            
+            // Disable input/button and show typing indicator
+            userInput.disabled = true;
+            chatForm.querySelector('button').disabled = true;
+            typingIndicator.style.display = 'block';
+
+            // 2. Send query to the remote backend API
+            try {
+                // Construct the full API endpoint URL
+                const apiUrl = `${REMOTE_BACKEND_URL}/chat`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                // 3. Display chatbot response or error
+                if (response.ok) {
+                    displayMessage(data.response, 'bot');
+                } else {
+                    const errorMessage = data.error || "Could not connect to the health assistant. Check the Colab console for backend errors.";
+                    displayMessage(`Error: ${errorMessage}`, 'bot');
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                displayMessage(`Connection Error: ${error.message || 'The remote backend server might be offline or unreachable.'}`, 'bot');
+            } finally {
+                // Re-enable input/button and hide typing indicator
+                typingIndicator.style.display = 'none';
+                userInput.disabled = false;
+                chatForm.querySelector('button').disabled = false;
+                userInput.focus(); // Focus back to the input field
+            }
+        });
+    </script>
+</body>
+</html>

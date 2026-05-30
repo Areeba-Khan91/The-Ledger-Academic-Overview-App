@@ -1,0 +1,5 @@
+Date,Flight_ID,Origin,Destination,Status
+2024-01-10,FL-991,DXB,LHR,Completed
+2024-01-11,FL-992,LHR,SIN,Completed
+2024-01-12,FL-993,SIN,LAX,Completed
+2024-01-13,FL-994,LAX (Los Angeles),JFK (New York),In-Flight
